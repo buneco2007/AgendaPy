@@ -1,0 +1,9 @@
+{
+    "editor.bracketPairColorization.enabled": true,
+    "editor.guides.bracketPairs": "active",
+    "editor.acceptSuggestionOnCommitCharacter": true,
+    "python.linting.pylintEnabled": true,
+    "python.linting.mypyEnabled": true,
+    "python.linting.pylamaEnabled": false,
+    "editor.formatOnSave": true
+}
