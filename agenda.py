@@ -207,4 +207,5 @@ while True:
             print(
                 f'{cores.Contorno.red}Contato nao encontrado!!!{cores.Estilos.reset}')
     else:
+        print('Saindo...!!!')
         sys.exit()
