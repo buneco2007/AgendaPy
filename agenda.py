@@ -1,6 +1,7 @@
 """
 [Projeto de agenda para reelembrar Python]
 """
+import csv
 import sys
 import cores
 
