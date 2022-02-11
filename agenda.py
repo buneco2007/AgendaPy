@@ -1,23 +1,23 @@
 """
 [Projeto de agenda para reelembrar Python]
 """
-import csv
+
 import sys
 import cores
 
 AGENDA: dict[str, dict] = {}
 
-AGENDA['Fernando Moraes Brasil Santos'] = {
-    'telefone': '11952463014',
-    'email': 'buneco2007@gmail.com',
-    'endereco': 'Rua joao Simao n80',
+AGENDA['Fernando Moraes'] = {
+    'telefone': '11999999999',
+    'email': 'teste@teste.com.br',
+    'endereco': 'Rua dos programadores, 56',
 
 }
 
-AGENDA['Jacqueline Cristina Augusto Moraes'] = {
-    'telefone': '11958371290',
-    'email': 'jacquelineaugusto28@hotmail.com',
-    'endereco': 'Rua joao Simao n80',
+AGENDA['Esposa linda'] = {
+    'telefone': '11888888888',
+    'email': 'esposalinda@esposa.com.br',
+    'endereco': 'Rua das esposas, 60',
 
 }
 
@@ -96,7 +96,7 @@ def apagar_contato(contato: str) -> tuple:
         resultado = AGENDA.pop(contato)
         return tuple(resultado)
     except KeyError:
-        return tuple()
+        return ()
 
 
 def imprimir_menu():
