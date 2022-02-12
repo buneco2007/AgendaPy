@@ -59,10 +59,10 @@ def incluir_editar_contato(nome: str, telefone: str,
         tuple: [Retorna o contato incluido]
     """
     try:
-        AGENDA[nome.strip()] = {
-            'telefone': telefone,
-            'email': email,
-            'endereco': endereco
+        AGENDA[nome.strip().upper()] = {
+            'telefone': telefone.upper(),
+            'email': email.upper(),
+            'endereco': endereco.upper()
         }
         return buscar_contato(nome)
     except KeyError:
@@ -79,7 +79,7 @@ def apagar_contato(name: str) -> tuple:
         [type]: [Retorna o contato apagado]
     """
     try:
-        res = AGENDA.pop(name)
+        res = AGENDA.pop(name.upper())
         return tuple(res)
     except KeyError:
         return ()
@@ -144,7 +144,7 @@ def imprimir_contato(nome: str, telefone: str, endereco: str, email: str) -> str
     return _contato
 
 
-def carregar_agenda():
+def carregar_agenda() -> bool:
     """[Funcao que carrega a agenda no inicio do programa]"""
     try:
         with open('agenda.csv', 'r', encoding='utf-8') as file_init:
@@ -153,12 +153,29 @@ def carregar_agenda():
                 new_contact = strings.strip().split(';')
                 incluir_editar_contato(new_contact[0], new_contact[1], new_contact[2],
                                        new_contact[3])
-            print('Agenda carregada com sucesso!!!')
+            return True
     except IOError:
-        print('Falha ao carregar a agenda')
+        return False
 
 
-carregar_agenda()
+def salvar_agenda() -> bool:
+    """[Funcao para salvar agenda em csv]
+    """
+    try:
+        with open('agenda.csv', 'w', encoding='utf-8') as file:
+            for contato_salvar in AGENDA.items():
+                export: str = (f'{contato_salvar[0]};{contato_salvar[1]["telefone"]};'
+                               f'{contato_salvar[1]["email"]};{contato_salvar[1]["endereco"]}\n')
+                file.write(export)
+            return True
+    except IOError:
+        print(f'{cores.Contorno.red}Houve um erro ao salvar a sua agenda!!!')
+        return False
+
+
+load_agenda_status: bool = carregar_agenda()
+if not load_agenda_status:
+    print(f'{cores.Contorno.red}Falha ao carregar os contatos da agenda!!!{cores.Estilos.reset}')
 while True:
     imprimir_menu()
     opcao: str = input(
@@ -215,14 +232,14 @@ while True:
             print(
                 f'{cores.Contorno.red}Contato nao encontrado!!!{cores.Estilos.reset}')
     elif opcao == '6':
-        try:
-            with open('agenda.csv', 'w', encoding='utf-8') as file:
-                for contato in AGENDA.items():
-                    export: str = (f'{contato[0]};{contato[1]["telefone"]};'
-                                   f'{contato[1]["email"]};{contato[1]["endereco"]}\n')
-                    file.write(export)
-        except IOError:
-            print(f'{cores.Contorno.red}Houve um erro ao salvar a sua agenda!!!')
+        if AGENDA:
+            exporting_status: bool = salvar_agenda()
+            if exporting_status:
+                print(
+                    f'{cores.Contorno.green}Agenda salva com sucesso!!!{cores.Estilos.reset}')
+        else:
+            print(
+                f'{cores.Contorno.red}Nao ha nada para se salvar!!!{cores.Estilos.reset}')
     else:
         print(f'{cores.Contorno.red}Saindo...!!!')
         sys.exit()
