@@ -64,6 +64,7 @@ def incluir_editar_contato(nome: str, telefone: str,
             'email': email.upper(),
             'endereco': endereco.upper()
         }
+        salvar_agenda()
         return buscar_contato(nome)
     except KeyError:
         return ()
@@ -80,6 +81,7 @@ def apagar_contato(name: str) -> tuple:
     """
     try:
         res = AGENDA.pop(name.upper())
+        salvar_agenda()
         return tuple(res)
     except KeyError:
         return ()
