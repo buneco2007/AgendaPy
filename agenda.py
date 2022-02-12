@@ -7,20 +7,6 @@ import cores
 
 AGENDA: dict[str, dict] = {}
 
-AGENDA['Fernando Moraes'] = {
-    'telefone': '11999999999',
-    'email': 'teste@teste.com.br',
-    'endereco': 'Rua dos programadores, 56',
-
-}
-
-AGENDA['Esposa linda'] = {
-    'telefone': '11888888888',
-    'email': 'esposalinda@esposa.com.br',
-    'endereco': 'Rua das esposas, 60',
-
-}
-
 
 def mostrar_todos_contatos() -> tuple:
     """[Funcao para mostrar todos os contatos]
@@ -30,8 +16,8 @@ def mostrar_todos_contatos() -> tuple:
     """
     contador: int = 0
     lista_todos_contatos: list = []
-    for contato in AGENDA.items():
-        lista_todos_contatos.append(contato)
+    for contact in AGENDA.items():
+        lista_todos_contatos.append(contact)
         contador += 1
     return (lista_todos_contatos, contador)
 
@@ -48,9 +34,9 @@ def buscar_contato(nome: str) -> tuple:
     try:
         contador: int = 0
         lista_de_nomes: list = []
-        for contato in AGENDA.items():
-            if nome.upper() in contato[0].upper():
-                lista_de_nomes.append(contato)
+        for contacts in AGENDA.items():
+            if nome.upper() in contacts[0].upper():
+                lista_de_nomes.append(contacts)
                 contador += 1
         if contador == 0:
             return ()
@@ -83,7 +69,7 @@ def incluir_editar_contato(nome: str, telefone: str,
         return ()
 
 
-def apagar_contato(contato: str) -> tuple:
+def apagar_contato(name: str) -> tuple:
     """[Funcao para apagar um contato]
 
     Args:
@@ -93,8 +79,8 @@ def apagar_contato(contato: str) -> tuple:
         [type]: [Retorna o contato apagado]
     """
     try:
-        resultado = AGENDA.pop(contato)
-        return tuple(resultado)
+        res = AGENDA.pop(name)
+        return tuple(res)
     except KeyError:
         return ()
 
@@ -113,6 +99,8 @@ def imprimir_menu():
           f'{cores.Contorno.yellow}Editar contato!{cores.Estilos.reset}')
     print(f'{cores.Contorno.green}5 - '
           f'{cores.Contorno.yellow}Excluir contato!{cores.Estilos.reset}')
+    print(f'{cores.Contorno.green}6 - '
+          f'{cores.Contorno.yellow}Exportar contatos para CSV!{cores.Estilos.reset}')
     print(f'{cores.Contorno.green}0 - '
           f'{cores.Contorno.yellow}Fechar agenda!{cores.Estilos.reset}')
 
@@ -146,16 +134,31 @@ def imprimir_contato(nome: str, telefone: str, endereco: str, email: str) -> str
     """
     _contato = ('#' * 10 +
                 f'\n{cores.Contorno.green}Nome: '
-                f'{cores.Contorno.yellow}{nome}{cores.Estilos.reset}'
+                f'{cores.Contorno.green}{nome}{cores.Estilos.reset}'
                 f'\n{cores.Contorno.green}Telefone: '
-                f'{cores.Contorno.yellow}{telefone}{cores.Estilos.reset}'
+                f'{cores.Contorno.green}{telefone}{cores.Estilos.reset}'
                 f'\n{cores.Contorno.green}Endereco: '
-                f'{cores.Contorno.yellow}{endereco}{cores.Estilos.reset}'
+                f'{cores.Contorno.green}{endereco}{cores.Estilos.reset}'
                 f'\n{cores.Contorno.green}E-mail: '
-                f'{cores.Contorno.yellow}{email}{cores.Estilos.reset}')
+                f'{cores.Contorno.green}{email}{cores.Estilos.reset}')
     return _contato
 
 
+def carregar_agenda():
+    """[Funcao que carrega a agenda no inicio do programa]"""
+    try:
+        with open('agenda.csv', 'r', encoding='utf-8') as file_init:
+            data = file_init.readlines()
+            for strings in data:
+                new_contact = strings.strip().split(';')
+                incluir_editar_contato(new_contact[0], new_contact[1], new_contact[2],
+                                       new_contact[3])
+            print('Agenda carregada com sucesso!!!')
+    except IOError:
+        print('Falha ao carregar a agenda')
+
+
+carregar_agenda()
 while True:
     imprimir_menu()
     opcao: str = input(
@@ -163,19 +166,23 @@ while True:
     if opcao == '1':
         contatos: tuple = mostrar_todos_contatos()
         for dados in contatos[0]:
-            print(imprimir_contato(dados[0], dados[1]["telefone"],
-                                   dados[1]["endereco"], dados[1]["email"]))
+            print(imprimir_contato(dados[0].upper(), dados[1]["telefone"].upper(),
+                                   dados[1]["endereco"].upper(), dados[1]["email"].upper()))
         print(contatos_encontrados(contatos[1]))
     elif opcao == '2':
-        _busca: str = input(
+        busca: str = input(
             f'{cores.Contorno.green}Digite o nome do contato que deseja buscar: '
             f'{cores.Estilos.reset}')
-        _resultado: tuple = buscar_contato(_busca)
-        if _resultado:
-            for _contato in _resultado[0]:
-                print(imprimir_contato(_contato[0], _contato[1]["telefone"],
-                                       _contato[1]["endereco"], _contato[1]["email"]))
-            print(contatos_encontrados(_resultado[1]))
+        resultado: tuple = buscar_contato(busca)
+        if resultado:
+            for contato in resultado[0]:
+                if busca.upper() in contato[0].upper():
+                    nome_vermelho = f'{cores.Contorno.red}{busca.upper()}{cores.Contorno.green}'
+                    novo_nome = contato[0].upper().replace(
+                        busca.upper(), nome_vermelho)
+                    print(imprimir_contato(novo_nome, contato[1]["telefone"],
+                                           contato[1]["endereco"], contato[1]["email"]))
+            print(contatos_encontrados(resultado[1]))
         else:
             print(
                 f'{cores.Contorno.red}Nenhum contato encontrado com esse nome!!!'
@@ -207,6 +214,15 @@ while True:
         else:
             print(
                 f'{cores.Contorno.red}Contato nao encontrado!!!{cores.Estilos.reset}')
+    elif opcao == '6':
+        try:
+            with open('agenda.csv', 'w', encoding='utf-8') as file:
+                for contato in AGENDA.items():
+                    export: str = (f'{contato[0]};{contato[1]["telefone"]};'
+                                   f'{contato[1]["email"]};{contato[1]["endereco"]}\n')
+                    file.write(export)
+        except IOError:
+            print(f'{cores.Contorno.red}Houve um erro ao salvar a sua agenda!!!')
     else:
-        print('Saindo...!!!')
+        print(f'{cores.Contorno.red}Saindo...!!!')
         sys.exit()
